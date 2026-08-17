@@ -7,12 +7,13 @@ namespace Claims.Services;
 public class CoversService : ICoversService
 {
     private readonly ClaimsContext _claimsContext;
-    private readonly Auditer _auditer;
+   // private readonly Auditer _auditer;
+   private readonly AuditChannel _auditChannel;
 
-    public CoversService(ClaimsContext claimsContext, Auditer auditer)
+    public CoversService(ClaimsContext claimsContext, AuditChannel auditChannel)
     {
         _claimsContext = claimsContext;
-        _auditer = auditer;
+        _auditChannel = auditChannel;
     }
 
     public async Task<IEnumerable<Cover>> GetCoversAsync()
@@ -34,14 +35,17 @@ public class CoversService : ICoversService
 
         _claimsContext.Covers.Add(cover);
         await _claimsContext.SaveChangesAsync();
-        _auditer.AuditCover(cover.Id, "POST");
+       // _auditer.AuditCover(cover.Id, "POST");
+       await _auditChannel.AddAuditAsync(new AuditMessage("Cover", cover.Id, "POST"));
 
         return cover;
     }
 
     public async Task DeleteCoverAsync(string id)
     {
-        _auditer.AuditCover(id, "DELETE");
+       // _auditer.AuditCover(id, "DELETE");
+       await _auditChannel.AddAuditAsync(new AuditMessage("Cover", id, "DELETE"));
+       
         var cover = await _claimsContext.Covers.FirstOrDefaultAsync(cover => cover.Id == id);
 
         if (cover is not null)
