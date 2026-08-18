@@ -67,18 +67,21 @@ public class CoversService : ICoversService
             _ => 1.3m
         };
 
-        var premiumPerDay = 1250 * multiplier;
-        var insuranceLength = (endDate - startDate).TotalDays;
-        var totalPremium = 0m;
+        //Changed from logic in Task 5
+        var basePremiumPerDay = 1250m * multiplier;
+        var totalDays = (endDate - startDate).Days;
 
-        for (var i = 0; i < insuranceLength; i++)
-        {
-            if (i < 30) totalPremium += premiumPerDay;
-            if (i < 180 && coverType == CoverType.Yacht) totalPremium += premiumPerDay - premiumPerDay * 0.05m;
-            else if (i < 180) totalPremium += premiumPerDay - premiumPerDay * 0.02m;
-            if (i < 365 && coverType != CoverType.Yacht) totalPremium += premiumPerDay - premiumPerDay * 0.03m;
-            else if (i < 365) totalPremium += premiumPerDay - premiumPerDay * 0.08m;
-        }
+        var tier1Days = Math.Min(30, totalDays);
+        var tier2Days = Math.Min(150, Math.Max(0, totalDays - 30));
+        var tier3Days = Math.Max(0, totalDays - 180);
+
+        var tier2Discount = coverType == CoverType.Yacht ? 0.05m : 0.02m;
+        var tier3Discount = coverType == CoverType.Yacht ? 0.08m : 0.03m;
+
+        // Calculation of the total premium based on the number of days in each tier and the respective discounts
+        var totalPremium = (tier1Days * basePremiumPerDay) +
+                       (tier2Days * basePremiumPerDay * (1m - tier2Discount)) +
+                       (tier3Days * basePremiumPerDay * (1m - tier3Discount));
 
         return totalPremium;
     }

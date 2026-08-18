@@ -8,11 +8,11 @@ public class Cover
     public string Id { get; set; } = string.Empty;
 
     [BsonElement("startDate")]
-    [BsonDateTimeOptions(DateOnly = true)]
+    //[BsonDateTimeOptions(DateOnly = true)] because of error
     public DateTime StartDate { get; set; }
 
     [BsonElement("endDate")]
-    [BsonDateTimeOptions(DateOnly = true)]
+    //[BsonDateTimeOptions(DateOnly = true)] because of error
     public DateTime EndDate { get; set; }
 
     [BsonElement("claimType")]

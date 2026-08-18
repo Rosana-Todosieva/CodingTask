@@ -7,6 +7,7 @@ using System.Text.Json.Serialization;
 using Testcontainers.MongoDb;
 using Testcontainers.MsSql;
 using Claims.Services;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -34,8 +35,10 @@ builder.Services
         x.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
 
+//Added for error handling in dotnet test
 builder.Services.AddDbContext<AuditContext>(options =>
-    options.UseSqlServer(sqlContainer.GetConnectionString()));
+    options.UseSqlServer(sqlContainer.GetConnectionString())
+    .ConfigureWarnings(warnings => warnings.Ignore(RelationalEventId.PendingModelChangesWarning)));
 
 builder.Services.AddDbContext<ClaimsContext>(options =>
 {
